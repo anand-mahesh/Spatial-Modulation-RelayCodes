@@ -3,7 +3,7 @@ close all;
 
 SNRdB = [0:1:20];
 NUM = 10^3;
-Nt  =4;
+Nt = 4;
 Nr = 4;
 Nu = 2;
 M = 16;
