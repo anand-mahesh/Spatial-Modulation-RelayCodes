@@ -75,7 +75,7 @@ for snrcount=1:length(SNRdB)
         
         %beta = sqrt(POW_S)/((abs(H_sr))^2 * POW_S + POW_N); % amplification factor 
         alpha = 1;
-        gamma = alpha.^2.*H_rd*H_rd'+eye(Nr);
+        gamma = alpha.^2*H_rd*H_rd'+eye(Nr);
         
         y_rd = alpha.*H_rd*y_sr + noise_rd;
         [~, Idx_min_Error1] = min(sum(abs(repmat(y_sd,1,siz)-H_sd*ESMconsdia).^2,1)+sum(abs(gamma^-0.5*repmat(y_rd,1,siz)-alpha*H_rd*H_sr*ESMconsdia).^2,1));
