@@ -10,7 +10,7 @@ M = 16;
 N = M/2;
 
 SNRdB = [0:1:15];
-NUM = 10e3;
+NUM = 10e4;
 SER_SD = zeros(size(SNRdB));
 SER_RD = zeros(size(SNRdB));
 
@@ -101,7 +101,7 @@ for snrcount=1:length(SNRdB)
         
         y_rd = alpha.*H_rd*y_sr + noise_rd;
         gamma= alpha^2.*H_rd*H_rd'+eye(Nr);
-        [~, Idx_min_Error1] = min(sum(abs(repmat(y_sd,1,siz)-H_sd*ESMconsdia).^2,1)+sum((abs(gamma^-0*(repmat(y_rd,1,siz)-(alpha*H_rd*H_sr*ESMconsdia)))).^2,1));
+        [~, Idx_min_Error1] = min(sum(abs(repmat(y_sd,1,siz)-H_sd*ESMconsdia).^2,1)+sum((abs(gamma^-0.5*(repmat(y_rd,1,siz)-(alpha*H_rd*H_sr*ESMconsdia)))).^2,1));
         ML_Binary_Results1 = dec2bin(Idx_min_Error1-1,log2(siz));
         BER_SMT_ML_RD = sum(dec2bin(x,eta)~= ML_Binary_Results1)/eta;
         SER_RD(snrcount) = SER_RD(snrcount) + BER_SMT_ML_RD;        
@@ -110,6 +110,7 @@ end
 SER_SD = SER_SD/NUM;
 SER_RD = SER_RD/NUM;
 
+%%
 figure
 semilogy(SNRdB, SER_SD, 'o-', 'LineWidth', 1,'color','r', 'DisplayName','LOS');
 hold on

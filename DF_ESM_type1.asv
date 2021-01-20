@@ -12,12 +12,10 @@ SER_SD = zeros(size(SNRdB));
 SER_RD = zeros(size(SNRdB));
 SER_check = 0;
 gamma = 1;
-counter = 1;
-
 
 THRESH = 10^-4;
 BLOCK_SIZE = 1023;
-buffer1 = zeros(Nt,BLOCK_SIZE);
+
 %%
 %ESM GENERATOR
 sigConstP = qammod((0:M-1).', M);
@@ -69,33 +67,37 @@ for snrcount=1:length(SNRdB)
         y_sd = H_sd*x_s + noise_sd; %Destination received the signal 'y_sd' from Source 
         y_sr = H_sr*x_s + noise_sr; % Relay received the signal 'y_sr' from Source
         
-%%  decoding and retransmitting in relay   
+        %decoding at the relay
+        counter = 0;
+              
+         siz = size(ESMconsdia,2);
+        [~, Idx_min_Error] = min(sum(abs(repmat(y_sr,1,siz)-H_sr*ESMconsdia).^2,1));
+        ML_Binary_Results = dec2bin(Idx_min_Error-1,log2(siz));
+        BER_SMT_ML_check =sum(dec2bin(x,eta)~= ML_Binary_Results)/eta;
+        SER_check = SER_check + BER_SMT_ML_check; 
         
-        if counter<=BLOCK_SIZE
-            siz = size(ESMconsdia,2);
-            [~, Idx_min_Error] = min(sum(abs(repmat(y_sr,1,siz)-H_sr*ESMconsdia).^2,1));
-            ML_Binary_Results = dec2bin(Idx_min_Error-1,log2(siz));
-            BER_SMT_ML_check =sum(dec2bin(x,eta)~= ML_Binary_Results)/eta;
-            SER_check = SER_check + BER_SMT_ML_check;
-            buffer1(:,counter) = ESMconsdia(:, Idx_min_Error);
-
-            if counter == BLOCK_SIZE;
-                if SER_check/BLOCK_SIZE < THRESH
-                    gamma = 1;
-                else
-                    gamma = 0;
-                end
-                SER_check = 0;
-                counter = 1;
-
-        %         if gamma == 1
-        %             for bit=0:BLOCK_SIZE
-        %                 y_rd = H_rd*buffer1(bit)+noise_rd;
-        %             end
-        %         end
+        
+        counter=counter+1;
+        if counter == 1023
+            if SER_check/BLOCK_SIZE < THRESH
+                gamma = 1;
+            else
+                gamma = 0;
             end
-
+            SER_check = 0;
+            counter = 0;
         end
+                  
+        %If error rate is less transmit else dont
+        if gamma == 1
+            y_rd = H_rd*y_sr + noise_rd;
+        end
+        
+        siz = size(ESMconsdia,2);
+        [~, Idx_min_Error1] = min(sum(abs(repmat(y_sd,1,siz)-H_sd*ESMconsdia).^2,1)+gamma.*sum((abs(gamma^-0.5*(repmat(y_rd,1,siz)-(alpha*H_rd*H_sr*ESMconsdia)))).^2,1));
+        ML_Binary_Results1 = dec2bin(Idx_min_Error1-1,log2(siz));
+        BER_SMT_ML_RD = sum(dec2bin(x,eta)~= ML_Binary_Results1)/eta;
+        SER_RD(snrcount) = SER_RD(snrcount) + BER_SMT_ML_RD;
     end
 end
 
