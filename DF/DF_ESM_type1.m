@@ -2,7 +2,7 @@ clear all;
 close all;
 
 SNRdB = [0:1:15];
-NUM = 1025;
+NUM = 10^5;
 Nt  =4;
 Nr = 4;
 Nu = 2;
@@ -12,10 +12,8 @@ SER_SD = zeros(size(SNRdB));
 SER_RD = zeros(size(SNRdB));
 SER_check = 0;
 gamma = 1;
-counter = 1;
-
-
-THRESH = 10^-4;
+counter = 0;
+THRESH = 10^-7;
 BLOCK_SIZE = 1023;
 buffer1 = zeros(Nt,BLOCK_SIZE);
 %%
@@ -77,25 +75,37 @@ for snrcount=1:length(SNRdB)
             ML_Binary_Results = dec2bin(Idx_min_Error-1,log2(siz));
             BER_SMT_ML_check =sum(dec2bin(x,eta)~= ML_Binary_Results)/eta;
             SER_check = SER_check + BER_SMT_ML_check;
-            buffer1(:,counter) = ESMconsdia(:, Idx_min_Error);
+            buffer1(:,counter+1) = ESMconsdia(:, Idx_min_Error);
 
-            if counter == BLOCK_SIZE;
+            if counter == BLOCK_SIZE
                 if SER_check/BLOCK_SIZE < THRESH
                     gamma = 1;
                 else
                     gamma = 0;
                 end
                 SER_check = 0;
-                counter = 1;
+                counter = 0;
 
-        %         if gamma == 1
-        %             for bit=0:BLOCK_SIZE
-        %                 y_rd = H_rd*buffer1(bit)+noise_rd;
-        %             end
-        %         end
+                
+                    for bit=0:BLOCK_SIZE
+                        if gamma == 1
+                            y_rd = H_rd*buffer1(:,bit+1)+noise_rd;
+                        else
+                            y_rd = zeros(Nr,1);
+                        end
+                        [~, Idx_min_Error1] = min(sum(abs(repmat(y_sd,1,siz)-H_sd*ESMconsdia).^2,1)+gamma.*sum((abs((repmat(y_rd,1,siz)-(H_rd*buffer1(:,bit+1))))).^2,1));
+                        ML_Binary_Results1 = dec2bin(Idx_min_Error1-1,log2(siz));
+                        BER_SMT_ML_RD = sum(dec2bin(x,eta)~= ML_Binary_Results1)/eta;
+                        SER_RD(snrcount) = SER_RD(snrcount) + BER_SMT_ML_RD; 
+                    
+                  end
             end
-
+            counter = counter +1;
         end
+      [~, Idx_min_Error1] = min(sum(abs(repmat(y_sd,1,siz)-H_sd*ESMconsdia).^2,1));
+       ML_Binary_Results1 = dec2bin(Idx_min_Error1-1,log2(siz));
+       BER_SMT_ML_SD = sum(dec2bin(x,eta)~= ML_Binary_Results1)/eta;
+        SER_SD(snrcount) = SER_SD(snrcount) + BER_SMT_ML_SD;   
     end
 end
 
