@@ -88,7 +88,7 @@ for snrcount=1:length(SNRdB)
         x_s = ESMconsdia(:,x+1);
         
         H_sd_uncorr = (1/sqrt(2))*(randn(Nr,Nt) + 1i.*randn(Nr,Nt));
-        H_sr_uncorr = (1/sqrt(2))*(randn(Nr_relay,Nt) + 1i.*randn(Nr_relay,Nt));
+        H_sr_uncorr = (1/sqrt(2))*(randn(Nr,Nt) + 1i.*randn(Nr,Nt));
         H_rd_uncorr = (1/sqrt(2))*(randn(Nr,Nt) + 1i.*randn(Nr,Nt));
  
         H_sd =  H_sd_uncorr*Rtx^(1/2);
@@ -102,7 +102,7 @@ for snrcount=1:length(SNRdB)
 
         
         noise_sd = std_dev.*(randn(Nr,1)+1j*randn(Nr,1)).*0.707;
-        noise_sr = std_dev.*(randn(Nr_relay,1)+1j*randn(Nr_relay,1)).*0.707;
+        noise_sr = std_dev.*(randn(Nr,1)+1j*randn(Nr,1)).*0.707;
         noise_rd = std_dev.*(randn(Nr,1)+1j*randn(Nr,1)).*0.707;
 
         %transmission from source to relay and destination

@@ -89,6 +89,7 @@ for snrcount=1:length(SNRdB)
             BER_SMT_ML_SR =sum(dec2bin(Idx,eta)~= ML_Binary_Results1)/eta;
             SER_check =SER_check+BER_SMT_ML_SR;
         end
+        
         if counter == BLOCK_SIZE
             if SER_check/BLOCK_SIZE <= THRESH
                 for k =1:BLOCK_SIZE    

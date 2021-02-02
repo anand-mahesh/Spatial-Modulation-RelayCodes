@@ -13,7 +13,7 @@ SER_RD = zeros(size(SNRdB));
 SER_check = 0;
 gamma = 1;
 counter = 0;
-THRESH = 10^-7;
+THRESH = 10^-4;
 BLOCK_SIZE = 1023;
 buffer1 = zeros(Nt,BLOCK_SIZE);
 %%
@@ -102,9 +102,9 @@ for snrcount=1:length(SNRdB)
             end
             counter = counter +1;
         end
-      [~, Idx_min_Error1] = min(sum(abs(repmat(y_sd,1,siz)-H_sd*ESMconsdia).^2,1));
-       ML_Binary_Results1 = dec2bin(Idx_min_Error1-1,log2(siz));
-       BER_SMT_ML_SD = sum(dec2bin(x,eta)~= ML_Binary_Results1)/eta;
+      [~, Idx_min_Error2] = min(sum(abs(repmat(y_sd,1,siz)-H_sd*ESMconsdia).^2,1));
+       ML_Binary_Results2 = dec2bin(Idx_min_Error2-1,log2(siz));
+       BER_SMT_ML_SD = sum(dec2bin(x,eta)~= ML_Binary_Results2)/eta;
         SER_SD(snrcount) = SER_SD(snrcount) + BER_SMT_ML_SD;   
     end
 end
