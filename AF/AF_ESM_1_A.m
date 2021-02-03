@@ -3,7 +3,7 @@ close all;
 
 SNRdB = [0:1:20];
 NUM = 10^4;
-Nt = 9;
+Nt = 10;
 Nr_relay = 9;
 Nr = 4;
 Nu = 2;
