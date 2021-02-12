@@ -3,8 +3,8 @@ close all;
 
 SNRdB = [0:1:20];
 NUM = 10^4;
-Nt = 10;
-Nr_relay = 9;
+Nt = 8;
+Nr_relay = 8;
 Nr = 4;
 Nu = 2;
 M = 16;
@@ -12,6 +12,7 @@ N = 8;
 SER_SD = zeros(size(SNRdB));
 SER_RD = zeros(size(SNRdB));
 rho = 0.9;
+K = 0.5;
 
 %%
 %ESM GENERATOR
@@ -87,9 +88,15 @@ for snrcount=1:length(SNRdB)
         x = randi([0 2^eta-1]);
         x_s = ESMconsdia(:,x+1);
         
+        %RAYLEIGH FADING
         H_sd_uncorr = (1/sqrt(2))*(randn(Nr,Nt) + 1i.*randn(Nr,Nt));
         H_sr_uncorr = (1/sqrt(2))*(randn(Nr_relay,Nt) + 1i.*randn(Nr_relay,Nt));
         H_rd_uncorr = (1/sqrt(2))*(randn(Nr,Nt) + 1i.*randn(Nr,Nt));
+        
+        %RICIAN FADING
+        H_sd_uncorr = sqrt(K/(1+K))+ ones(size(H_sd_uncorr))+ sqrt(1/(1+K))*H_sd_uncorr;
+        H_sr_uncorr = sqrt(K/(1+K))+ ones(size(H_sr_uncorr))+ sqrt(1/(1+K))*H_sr_uncorr;
+        H_rd_uncorr = sqrt(K/(1+K))+ ones(size(H_rd_uncorr))+ sqrt(1/(1+K))*H_rd_uncorr;
  
         H_sd =  H_sd_uncorr*Rtx^(1/2);
         H_sr =  H_sr_uncorr*Rtx^(1/2);
